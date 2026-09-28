@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
-from .api.v1 import avatars, stories
+from .api.v1 import avatars, stories, admin
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -20,6 +20,8 @@ app.add_middleware(
 
 app.include_router(avatars.router, prefix=settings.API_V1_STR)
 app.include_router(stories.router, prefix=settings.API_V1_STR)
+app.include_router(admin.router, prefix=settings.API_V1_STR)
+
 
 @app.get("/health")
 async def health_check():
