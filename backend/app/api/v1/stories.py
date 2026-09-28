@@ -5,13 +5,48 @@ from ...models.schemas import (
     StoryGenerateRequest,
     StoryJobStatusResponse,
     JobStatus,
-    GuardianApprovalRequest
+    GuardianApprovalRequest,
+    ScriptAssistRequest,
+    ScriptAssistResponse
 )
+from ...services.script_copilot import ScriptCoPilotService
 from .avatars import AVATARS_DB
 
 router = APIRouter(prefix="/stories", tags=["Stories"])
 
 JOBS_DB = {}
+
+@router.post("/assist-script", response_model=ScriptAssistResponse)
+async def assist_script(request: ScriptAssistRequest):
+    """
+    AI Script Co-Pilot: Generates gentle, loving story scripts tailored for young children
+    with strict psychological grief guardrails.
+    """
+    script_text = await ScriptCoPilotService.generate_script(
+        occasion=request.occasion.value,
+        child_name=request.child_name,
+        favorite_memory=request.favorite_memory,
+        custom_notes=request.custom_notes
+    )
+    
+    titles = {
+        "bedtime_story": f"Bedtime Wishes for {request.child_name or 'You'}",
+        "birthday_wish": f"Birthday Blessing for {request.child_name or 'You'}",
+        "milestone_congrats": f"Proud of You, {request.child_name or 'Champion'}!",
+        "life_advice": "A Father's Wisdom and Love"
+    }
+    
+    # Word count estimation: ~130 words per minute speaking rate
+    words = len(script_text.split())
+    duration = max(15, int((words / 130) * 60))
+    
+    return ScriptAssistResponse(
+        occasion=request.occasion,
+        suggested_title=titles.get(request.occasion.value, "A Loving Story"),
+        script_text=script_text,
+        estimated_duration_seconds=duration
+    )
+
 
 async def run_story_pipeline(job_id: str, avatar_id: str, script_text: str):
     """

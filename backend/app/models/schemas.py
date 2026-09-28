@@ -64,3 +64,28 @@ class StoryJobStatusResponse(BaseModel):
 class GuardianApprovalRequest(BaseModel):
     guardian_pin: str = Field(..., min_length=4, max_length=6)
     approve: bool
+
+# --- AI Script Co-Pilot Schemas ---
+class ScriptAssistRequest(BaseModel):
+    occasion: StoryCategory
+    child_name: Optional[str] = Field(None, example="Leo")
+    favorite_memory: Optional[str] = Field(None, example="Building Lego towers on Sunday mornings")
+    custom_notes: Optional[str] = Field(None, example="Remind him to keep practicing his soccer kicks")
+
+class ScriptAssistResponse(BaseModel):
+    occasion: StoryCategory
+    suggested_title: str
+    script_text: str
+    estimated_duration_seconds: int
+
+# --- Pre-signed Media Upload Schemas ---
+class PresignedUploadRequest(BaseModel):
+    file_extension: str = Field(..., example=".m4a")
+    content_type: str = Field(..., example="audio/mp4")
+
+class PresignedUploadResponse(BaseModel):
+    storage_key: str
+    upload_url: str
+    content_type: str
+    expires_in_seconds: int
+

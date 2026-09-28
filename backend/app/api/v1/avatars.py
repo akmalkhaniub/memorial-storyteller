@@ -1,12 +1,30 @@
 from fastapi import APIRouter, HTTPException, status
 import uuid
 from datetime import datetime
-from ...models.schemas import AvatarCreateRequest, AvatarResponse
+from ...models.schemas import (
+    AvatarCreateRequest,
+    AvatarResponse,
+    PresignedUploadRequest,
+    PresignedUploadResponse
+)
+from ...services.storage_service import StorageService
 
 router = APIRouter(prefix="/avatars", tags=["Avatars"])
 
 # In-memory store for rapid prototyping / testing
 AVATARS_DB = {}
+
+@router.post("/upload-url", response_model=PresignedUploadResponse)
+async def get_presigned_upload_url(request: PresignedUploadRequest):
+    """
+    Returns a pre-signed URL allowing mobile apps to securely upload large media files
+    directly to Cloudflare R2 / S3 without blocking the backend.
+    """
+    return StorageService.generate_presigned_upload_url(
+        file_extension=request.file_extension,
+        content_type=request.content_type
+    )
+
 
 @router.post("", response_model=AvatarResponse, status_code=status.HTTP_201_CREATED)
 async def create_avatar(request: AvatarCreateRequest):

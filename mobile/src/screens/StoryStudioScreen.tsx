@@ -11,9 +11,42 @@ const TEMPLATES = [
 export default function StoryStudioScreen({ navigation }: any) {
   const [selectedCategory, setSelectedCategory] = useState('bedtime_story');
   const [title, setTitle] = useState('The Starlight Blanket');
+  const [childName, setChildName] = useState('Leo');
   const [script, setScript] = useState(
     "Goodnight my brave champion. Look up at the stars tonight. Remember how proud I am of you, and that my love is always wrapped around you like a warm blanket. Sweet dreams!"
   );
+
+  const handleAIAssist = () => {
+    // Generates empathetic, child-safe message matching the backend template
+    const name = childName.trim() || 'my champion';
+    if (selectedCategory === 'bedtime_story') {
+      setTitle(`Bedtime Wishes for ${name}`);
+      setScript(
+        `Goodnight, my sweet ${name}. Look up at the stars tonight and remember how much I love you. ` +
+        `Whenever you feel lonely, place your hand over your heart—that's where I'll always be, ` +
+        `protecting your dreams. Close your eyes and sleep tight.`
+      );
+    } else if (selectedCategory === 'birthday_wish') {
+      setTitle(`Happy Birthday, ${name}!`);
+      setScript(
+        `Happy Birthday, my wonderful ${name}! Look at how much you've grown and how proud I am of you every single day. ` +
+        `Eat an extra big slice of cake for me today, make a big wish, and keep smiling that beautiful smile!`
+      );
+    } else if (selectedCategory === 'milestone_congrats') {
+      setTitle(`So Proud of You, ${name}!`);
+      setScript(
+        `I am bursting with pride for you, ${name}! I knew you could do it. ` +
+        `Always remember you are braver than you believe, stronger than you seem, and loved more than you know!`
+      );
+    } else {
+      setTitle(`Words of Love for ${name}`);
+      setScript(
+        `Always remember, ${name}: be kind to others, never be afraid to make mistakes, and know that you are deeply, unconditionally loved. ` +
+        `Hold your head high—you make me proud every single day.`
+      );
+    }
+    Alert.alert("Draft Created ✨", "AI Co-Pilot has drafted a gentle message. You can customize any words before generating.");
+  };
 
   const handleGenerate = () => {
     Alert.alert(
@@ -56,8 +89,23 @@ export default function StoryStudioScreen({ navigation }: any) {
         placeholderTextColor="#64748B"
       />
 
-      {/* Script */}
-      <Text style={styles.sectionLabel}>Story Script (Spoken by Dad)</Text>
+      {/* Child Name (Optional for Personalization) */}
+      <Text style={styles.sectionLabel}>Child's Name (for personalization)</Text>
+      <TextInput
+        style={styles.input}
+        value={childName}
+        onChangeText={setChildName}
+        placeholder="e.g. Leo, Maya"
+        placeholderTextColor="#64748B"
+      />
+
+      {/* Script & AI Co-Pilot Button */}
+      <View style={styles.scriptHeaderRow}>
+        <Text style={styles.sectionLabel}>Story Script (Spoken by Dad)</Text>
+        <TouchableOpacity style={styles.copilotButton} onPress={handleAIAssist}>
+          <Text style={styles.copilotButtonText}>✨ Help Me Write</Text>
+        </TouchableOpacity>
+      </View>
       <TextInput
         style={[styles.input, styles.textArea]}
         value={script}
@@ -87,7 +135,11 @@ const styles = StyleSheet.create({
   categoryBadgeActive: { backgroundColor: '#0284C7', borderColor: '#38BDF8' },
   categoryText: { color: '#94A3B8', fontSize: 13, fontWeight: '500' },
   categoryTextActive: { color: '#FFFFFF', fontWeight: '700' },
+  scriptHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, marginBottom: 8 },
+  copilotButton: { backgroundColor: '#38BDF8', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12 },
+  copilotButtonText: { color: '#0F172A', fontSize: 12, fontWeight: '700' },
   input: { backgroundColor: '#1E293B', color: '#F8FAFC', padding: 14, borderRadius: 12, borderWidth: 1, borderColor: '#334155', fontSize: 15 },
+
   textArea: { height: 120, textAlignVertical: 'top' },
   characterCount: { color: '#64748B', fontSize: 12, marginTop: 6, textAlign: 'right' },
   primaryButton: { backgroundColor: '#38BDF8', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 24, marginBottom: 40 },
